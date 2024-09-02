@@ -1,0 +1,11 @@
+Compilacion y ejecución:
+cargo build
+
+Añadir una tarea:
+cargo run -- add "Mi nueva tarea"
+
+Listar tareas:
+cargo run -- list
+
+Eliminar una tarea:
+cargo run -- delete 1
