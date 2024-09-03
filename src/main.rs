@@ -12,7 +12,7 @@ struct Task {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = Command::new("Task Manager")
         .version("1.0")
-        .author("Tu Nombre")
+        .author("LRJ")
         .about("Una aplicación simple para administrar tareas")
         .subcommand(
             Command::new("add")
@@ -25,6 +25,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .about("Eliminar una tarea por ID")
                 .arg(Arg::new("id").required(true).help("ID de la tarea")),
         )
+        .subcommand(Command::new("delete-all").about("Eliminar todas las tareas"))
         .get_matches();
 
     let conn = Connection::open("tasks.db")?;
@@ -41,8 +42,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     match matches.subcommand() {
         Some(("add", sub_matches)) => {
             let description = sub_matches.get_one::<String>("description").unwrap();
-            conn.execute("INSERT INTO tasks (description) VALUES (?1)",
-                         params![description])?;
+            conn.execute("INSERT INTO tasks (description) VALUES (?1)", params![description])?;
             println!("Tarea añadida: {}", description);
         }
         Some(("list", _)) => {
@@ -58,6 +58,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let task = task?;
                 println!("ID: {}, Descripción: {}", task.id, task.description);
             }
+        }
+        Some(("delete-all", _)) => {
+            conn.execute("DELETE FROM tasks", [])?;
+            println!("Todas las tareas han sido eliminadas");
         }
         Some(("delete", sub_matches)) => {
             let id_str = sub_matches.get_one::<String>("id").unwrap();
